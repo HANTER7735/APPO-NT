@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Dental Clinic</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="forIndex.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <!-- Your custom Firebase initialization -->
+    <script src="firebase.js"></script>
+</head>
+
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">Dental Clinic</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="pas.html">Admin Login</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero" id="home">
+        <div class="hero-content container">
+            <h1>Welcome to Our Dental Clinic</h1>
+            <p>Experience top-quality dental care with our expert team</p>
+            <a href="#appointment" class="btn">Book Your Appointment</a>
+        </div>
+    </section>
+
+    <section id="doctor-card">
+        <div class="container">
+            <h2>Our Expert Doctors</h2>
+            <div class="doctor-card-container">
+                <div class="doctor-card">
+                    <img src="Imaages/4.jpg" alt="Doctor Image">
+                    <h3>Dr. Alice Brown</h3>
+                    <p>Orthodontist</p>
+                </div>
+                <div class="doctor-card">
+                    <img src="Imaages/2.jpeg" alt="Doctor Image">
+                    <h3>Dr. jack Smith</h3>
+                    <p>Periodontist</p>
+                </div>
+                <div class="doctor-card">
+                    <img src="Imaages/3.jpg" alt="Doctor Image">
+                    <h3>Dr. John Doe</h3>
+                    <p>Endodontist</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="appointment">
+        <div class="container">
+            <div class="appointment-form">
+                <h2>Book Your Appointment</h2>
+                <form name="V1" id="V1"
+                    action="https://script.google.com/macros/s/AKfycbyrUZgCFK4594fwQu04VCyGhmSyLvhR6gNv_XczKjJAgDIv7vr1XZFsd5Al5_6KRl65/exec"
+                    method="POST">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Full Name:</label>
+                            <input type="text" id="name" name="name" required placeholder="Enter your full name">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number:</label>
+                            <input type="tel" id="phone" name="phone" required placeholder="Enter your phone number">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" name="email" placeholder="Enter your email address">
+                        </div>
+                        <div class="form-group">
+                            <label for="appointment-date">Appointment Date:</label>
+                            <input type="date" id="appointment-date" name="appointment-date" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Select Service:</label>
+                            <div class="radio-group" id="service">
+                                <label class="custom-radio">
+                                    <input type="radio" name="service" value="Not Urgent" required>
+                                    <span class="radio-checkmark"></span>
+                                    Not Urgent
+                                </label>
+                                <label class="custom-radio">
+                                    <input type="radio" name="service" value="Urgent" id="urgent-option">
+                                    <span class="radio-checkmark"></span>
+                                    Urgent
+                                </label>
+                                <label class="custom-radio">
+                                    <input type="radio" name="service" value="Extraction" id="extraction-option">
+                                    <span class="radio-checkmark"></span>
+                                    Extraction
+                                </label>
+                            </div>
+                            <span id="urgent-counter"></span>
+                            <span id="extraction-counter"></span>
+                        </div>
+                        <div class="form-group" id="appointment-time-1-wrapper">
+                            <label for="appointment-time-1">Appointment Time:</label>
+                            <select id="appointment-time-1" name="appointment-time-1" required>
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Doctor:</label>
+                        <div class="radio-group" id="doctor">
+                            <label class="custom-radio">
+                                <input type="radio" name="doctor" value="Dr.Alice Brown" required>
+                                <span class="radio-checkmark"></span>
+                                Dr.Alice Brown
+                            </label>
+                            <label class="custom-radio">
+                                <input type="radio" name="doctor" value="Dr. jack Smith">
+                                <span class="radio-checkmark"></span>
+                                Dr. jack Smith
+                            </label>
+                            <label class="custom-radio">
+                                <input type="radio" name="doctor" value="Dr. John Doe">
+                                <span class="radio-checkmark"></span>
+                                Dr. John Doe
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submit-btn">Book Appointment</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <div id="circular-progress-container" style="display: none;">
+        <div class="loader"></div>
+    </div>
+
+    <footer id="contact">
+        <div class="container">
+            <h3>Contact Us</h3>
+            <p>Email: dental@dentalclinic.com</p>
+            <p>Phone: +90 534 684 87 50</p>
+            <p>Address: Konya, Turkey</p>
+            <div class="social-links">
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize urgent counter and limit
+        const urgentLimitPerDay = 5;
+        const maxAppointmentsPerSlot = 2;
+        const extractionLimitPerDay = 10;
+        let currentExtractionCountForDay = 0;
+        let currentUrgentCountForDay = 0;
+        let selectedDate = null;
+
+        // Function to generate time slots
+        function generateTimeSlots(start, end, interval) {
+            let times = [];
+            let startTime = new Date(`1970-01-01T${start}:00`);
+            let endTime = new Date(`1970-01-01T${end}:00`);
+
+            while (startTime <= endTime) {
+                let timeString = startTime.toTimeString().slice(0, 5);
+                times.push(timeString);
+                startTime.setMinutes(startTime.getMinutes() + interval);
+            }
+
+            return times;
+        }
+
+        // Function to fetch booked times and counts from Firebase for a selected date
+        function fetchBookedTimes(date, callback) {
+            db.collection("appointments")
+                .where("appointmentDate", "==", date)
+                .get()
+                .then(function (querySnapshot) {
+                    let bookedTimes = {};
+                    querySnapshot.forEach(function (doc) {
+                        let data = doc.data();
+                        if (!bookedTimes[data.appointmentTime]) {
+                            bookedTimes[data.appointmentTime] = 0;
+                        }
+                        bookedTimes[data.appointmentTime] += data.count;
+                    });
+                    callback(bookedTimes);
+                })
+                .catch(function (error) {
+                    console.error("Error getting documents: ", error);
+                    alert("Error fetching booked times.");
+                });
+        }
+
+        function fetchExtractionCountForDate(date) {
+            db.collection("appointments")
+                .where("service", "==", "Extraction")
+                .where("appointmentDate", "==", date)
+                .get()
+                .then(function (querySnapshot) {
+                    currentExtractionCountForDay = querySnapshot.size;
+                    document.getElementById('extraction-counter').textContent = ` (Extraction booked: ${currentExtractionCountForDay}/${extractionLimitPerDay})`;
+                    if (currentExtractionCountForDay >= extractionLimitPerDay) {
+                        document.getElementById('extraction-option').disabled = true;
+                    } else {
+                        document.getElementById('extraction-option').disabled = false;
+                    }
+                })
+                .catch(function (error) {
+                    console.error("Error fetching extraction count for the date: ", error);
+                    alert("Error fetching extraction appointments count for the selected date.");
+                });
+        }
+
+        function fetchUrgentCountForDate(date) {
+            db.collection("appointments")
+                .where("service", "==", "Urgent")
+                .where("appointmentDate", "==", date)
+                .get()
+                .then(function (querySnapshot) {
+                    currentUrgentCountForDay = querySnapshot.size;
+                    document.getElementById('urgent-counter').textContent = ` (Urgent booked: ${currentUrgentCountForDay}/${urgentLimitPerDay})`;
+                    if (currentUrgentCountForDay >= urgentLimitPerDay) {
+                        document.getElementById('urgent-option').disabled = true;
+                    } else {
+                        document.getElementById('urgent-option').disabled = false;
+                    }
+                })
+                .catch(function (error) {
+                    console.error("Error fetching urgent count for the date: ", error);
+                    alert("Error fetching urgent appointments count for the selected date.");
+                });
+        }
+
+        function disablePastAndNextHourTimes() {
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMinutes = now.getMinutes();
+
+            const timeSelect = document.getElementById("appointment-time-1");
+            const options = timeSelect.options;
+
+            for (let i = 0; i < options.length; i++) {
+                let optionTime = options[i].value.split(':');
+                let optionHour = parseInt(optionTime[0], 10);
+                let optionMinutes = parseInt(optionTime[1], 10);
+
+                if (optionHour < currentHour || (optionHour === currentHour && optionMinutes <= currentMinutes + 60)) {
+                    options[i].disabled = true;
+                }
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const timeSelect = document.getElementById("appointment-time-1");
+            const times = generateTimeSlots("10:00", "20:00", 30);
+
+            times.forEach(time => {
+                let option = document.createElement("option");
+                option.value = time;
+                option.textContent = time;
+                timeSelect.appendChild(option);
+            });
+
+            const today = new Date().toISOString().split('T')[0];
+            const appointmentDateInput = document.getElementById("appointment-date");
+            appointmentDateInput.setAttribute("min", today);
+
+            appointmentDateInput.addEventListener("change", function () {
+                selectedDate = appointmentDateInput.value;
+
+                if (selectedDate === today) {
+                    disablePastAndNextHourTimes();
+                }
+
+                fetchUrgentCountForDate(selectedDate);
+                fetchExtractionCountForDate(selectedDate);
+
+                fetchBookedTimes(selectedDate, function (bookedTimes) {
+                    const options = timeSelect.options;
+                    for (let i = 0; i < options.length; i++) {
+                        options[i].disabled = false;
+                    }
+
+                    disableBookedTimes(bookedTimes);
+
+                    if (selectedDate === today) {
+                        disablePastAndNextHourTimes();
+                    }
+                });
+            });
+        });
+
+        document.getElementById('V1').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            document.getElementById('circular-progress-container').style.display = 'block';
+
+            const selectedService = document.querySelector('input[name="service"]:checked').value;
+            if (selectedService === 'Urgent' && currentUrgentCountForDay >= urgentLimitPerDay) {
+                alert('Urgent appointments are fully booked for the selected date.');
+                document.getElementById('circular-progress-container').style.display = 'none';
+                return;
+            }
+
+            let formData = {
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                service: selectedService,
+                appointmentDate: document.getElementById('appointment-date').value,
+                appointmentTime: document.getElementById('appointment-time-1').value,
+                doctor: document.querySelector('input[name="doctor"]:checked').value,
+                count: 1
+            };
+
+            db.collection("appointments").add(formData)
+                .then(function () {
+                    // Redirect to Thank You page or show a success message
+                    document.getElementById('circular-progress-container').style.display = 'none';
+                    window.location.href = "Thank_You_Page.html";
+                })
+
+                .catch(function (error) {
+                    console.error("Error booking appointment: ", error);
+                    alert("There was an error booking your appointment. Please try again.");
+                    document.getElementById('circular-progress-container').style.display = 'none';
+                });
+        });
+
+        function disableBookedTimes(bookedTimes) {
+            const timeSelect = document.getElementById("appointment-time-1");
+            const options = timeSelect.options;
+
+            for (let i = 0; i < options.length; i++) {
+                let time = options[i].value;
+                if (bookedTimes[time] && bookedTimes[time] >= maxAppointmentsPerSlot) {
+                    options[i].disabled = true;
+                } else {
+                    options[i].disabled = false;
+                }
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById('top-right-btn').addEventListener('click', function () {
+                window.location.href = "pas.html";
+            });
+        });
+
+        // Smooth scroll functionality
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Change header background on scroll
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+
+</html>

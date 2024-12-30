@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #6ac8ba;
+            --bg-color: #0a192f;
+            --text-color: #8892b0;
+            --header-color: #ccd6f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .admin-container {
+            max-width: 400px;
+            width: 100%;
+            padding: 40px;
+            background-color: rgba(17, 34, 64, 0.75);
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 255, 218, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .admin-container:hover {
+            transform: translateY(-5px);
+        }
+
+        h2 {
+            margin-bottom: 30px;
+            color: var(--header-color);
+            font-size: 28px;
+            letter-spacing: 1px;
+        }
+
+        .password-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .password-container input {
+            padding: 15px;
+            margin: 10px 0;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid rgba(34, 180, 175, 0.3);
+            background-color: rgba(17, 34, 64, 0.75);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .password-container input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 10px rgba(100, 255, 218, 0.2);
+        }
+
+        .password-container button {
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .password-container button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary-color);
+            transition: all 0.3s ease;
+            z-index: -1;
+        }
+
+        .password-container button:hover {
+            color: var(--bg-color);
+        }
+
+        .password-container button:hover::before {
+            left: 0;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            margin-top: 15px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .error-message.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 480px) {
+            .admin-container {
+                width: 90%;
+                padding: 30px;
+            }
+        }
+
+        /* Background animation */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .background span {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background-color: var(--primary-color);
+            opacity: 0.1;
+            border-radius: 50%;
+            animation: move 8s linear infinite;
+        }
+
+        @keyframes move {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: translateY(-1000px) rotate(720deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background"></div>
+    <div class="admin-container">
+        <h2>Admin Access</h2>
+        <div class="password-container">
+            <input type="password" id="password" placeholder="Enter password" required>
+            <button onclick="checkPassword()">Login</button>
+            <p id="error-message" class="error-message">Access Denied. Incorrect password.</p>
+        </div>
+    </div>
+
+    <script>
+        function checkPassword() {
+            const enteredPassword = document.getElementById("password").value;
+            const errorMessage = document.getElementById("error-message");
+            if (enteredPassword === "Dental123") {
+                window.location.href = "Appointments.html";
+            } else {
+                errorMessage.classList.add('show');
+                setTimeout(() => {
+                    errorMessage.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // Create animated background
+        const background = document.querySelector('.background');
+        for (let i = 0; i < 50; i++) {
+            const span = document.createElement('span');
+            span.style.left = `${Math.random() * 100}vw`;
+            span.style.top = `${Math.random() * 100}vh`;
+            span.style.animationDuration = `${Math.random() * 5 + 5}s`;
+            span.style.animationDelay = `${Math.random() * 5}s`;
+            background.appendChild(span);
+        }
+    </script>
+</body>
+
+</html>

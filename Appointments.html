@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Appointments</title>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <!-- Your custom Firebase initialization -->
+    <script src="firebase.js"></script>
+</head>
+
+<body class="bg-gray-900 text-gray-100 font-sans">
+    <div class="container mx-auto p-8">
+        <h1 class="text-4xl font-bold text-center mb-8">View Appointments</h1>
+
+        <div class="flex flex-col md:flex-row md:justify-between mb-8">
+            <div class="flex-1 mb-4 md:mr-4">
+                <label for="appointment-date" class="block text-sm mb-1">Select Date:</label>
+                <input type="date" id="appointment-date" name="appointment-date" required
+                    class="w-full px-4 py-2 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring focus:ring-green-700">
+            </div>
+            <button id="view-appointments-btn"
+                class="mt-4 md:mt-0 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-500 transition duration-300 ease-in-out">
+                View Appointments
+            </button>
+        </div>
+
+        <div id="appointments-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Appointments will be displayed here -->
+        </div>
+
+        <div id="circular-progress-container" class="hidden flex justify-center items-center my-8">
+            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
+        </div>
+    </div>
+
+    <!-- Modal for messages -->
+    <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full">
+            <div id="modal-message" class="text-center text-white mb-4"></div>
+            <div class="flex justify-center">
+                <button id="modal-close-btn"
+                    class="bg-red-500 px-4 py-2 rounded-lg text-white hover:bg-red-700 transition">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for confirmation -->
+    <div id="confirm-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full">
+            <div id="confirm-message" class="text-center text-white mb-4">Are you sure you want to cancel this
+                appointment?</div>
+            <div class="flex justify-center space-x-4">
+                <button id="confirm-yes-btn"
+                    class="bg-red-500 px-4 py-2 rounded-lg text-white hover:bg-red-700 transition">Yes</button>
+                <button id="confirm-no-btn"
+                    class="bg-gray-500 px-4 py-2 rounded-lg text-white hover:bg-gray-700 transition">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for editing appointment -->
+    <div id="edit-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full">
+            <h3 class="text-lg font-bold text-white mb-4">Edit Appointment</h3>
+            <div class="mb-4">
+                <label for="edit-name" class="block text-sm text-white mb-1">Name:</label>
+                <input type="text" id="edit-name" class="w-full px-4 py-2 rounded-lg bg-gray-700 text-white" />
+            </div>
+            <div class="mb-4">
+                <label for="edit-service" class="block text-sm text-white mb-1">Service:</label>
+                <input type="text" id="edit-service" class="w-full px-4 py-2 rounded-lg bg-gray-700 text-white" />
+            </div>
+            <div class="mb-4">
+                <label for="edit-time" class="block text-sm text-white mb-1">Time:</label>
+                <input type="time" id="edit-time" class="w-full px-4 py-2 rounded-lg bg-gray-700 text-white" />
+            </div>
+            <div class="flex justify-center space-x-4">
+                <button id="save-edit-btn"
+                    class="bg-green-500 px-4 py-2 rounded-lg text-white hover:bg-green-700 transition">Save</button>
+                <button id="cancel-edit-btn"
+                    class="bg-gray-500 px-4 py-2 rounded-lg text-white hover:bg-gray-700 transition">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentEditAppointmentId = null;
+
+        // Function to open modal
+        function openModal(message) {
+            document.getElementById('modal-message').innerText = message;
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        // Function to close modal
+        document.getElementById('modal-close-btn').addEventListener('click', function () {
+            document.getElementById('modal').classList.add('hidden');
+        });
+
+        // Function to open confirmation modal
+        function openConfirmModal(callback) {
+            document.getElementById('confirm-modal').classList.remove('hidden');
+
+            document.getElementById('confirm-yes-btn').onclick = function () {
+                document.getElementById('confirm-modal').classList.add('hidden');
+                callback(true);  // Execute callback with confirmation
+            };
+
+            document.getElementById('confirm-no-btn').onclick = function () {
+                document.getElementById('confirm-modal').classList.add('hidden');
+                callback(false); // Cancel action
+            };
+        }
+
+        // Function to open edit modal
+        function openEditModal(appointment) {
+            document.getElementById('edit-name').value = appointment.name;
+            document.getElementById('edit-service').value = appointment.service;
+            document.getElementById('edit-time').value = appointment.appointmentTime;
+            document.getElementById('edit-modal').classList.remove('hidden');
+            currentEditAppointmentId = appointment.id;
+        }
+
+        // Function to close edit modal
+        document.getElementById('cancel-edit-btn').addEventListener('click', function () {
+            document.getElementById('edit-modal').classList.add('hidden');
+        });
+
+        // Save edited appointment
+        document.getElementById('save-edit-btn').addEventListener('click', function () {
+            const updatedName = document.getElementById('edit-name').value;
+            const updatedService = document.getElementById('edit-service').value;
+            const updatedTime = document.getElementById('edit-time').value;
+
+            if (currentEditAppointmentId) {
+                // Update appointment in Firebase
+                db.collection("appointments").doc(currentEditAppointmentId).update({
+                    name: updatedName,
+                    service: updatedService,
+                    appointmentTime: updatedTime
+                }).then(() => {
+                    openModal("Appointment updated successfully.");
+                    // Refresh the appointments list
+                    const selectedDate = document.getElementById("appointment-date").value;
+                    fetchAppointmentsByDate(selectedDate);
+                }).catch((error) => {
+                    console.error("Error updating appointment: ", error);
+                    openModal("Error updating appointment.");
+                }).finally(() => {
+                    document.getElementById('edit-modal').classList.add('hidden');
+                });
+            }
+        });
+
+        // Function to fetch appointments for a selected date from Firestore
+        function fetchAppointmentsByDate(date) {
+            document.getElementById('circular-progress-container').style.display = 'flex'; // Show loader
+            db.collection("appointments")
+                .where("appointmentDate", "==", date)
+                .get()
+                .then(function (querySnapshot) {
+                    let appointments = [];
+                    querySnapshot.forEach(function (doc) {
+                        let data = doc.data();
+                        data.id = doc.id; // Store the document ID for cancellation and edit
+                        appointments.push(data);
+                    });
+                    displayAppointments(appointments);
+                })
+                .catch(function (error) {
+                    console.error("Error fetching appointments: ", error);
+                    openModal("Error fetching appointments.");
+                })
+                .finally(function () {
+                    document.getElementById('circular-progress-container').style.display = 'none'; // Hide loader
+                });
+        }
+
+        // Function to display appointments in the UI
+        function displayAppointments(appointments) {
+            const appointmentsList = document.getElementById("appointments-list");
+            appointmentsList.innerHTML = ""; // Clear previous results
+
+            if (appointments.length === 0) {
+                appointmentsList.innerHTML = `
+                    <div class="text-center text-gray-400">
+                        No appointments found for the selected date.
+                    </div>
+                `;
+                return;
+            }
+
+            appointments.forEach(appointment => {
+                let appointmentHTML = `
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h3 class="text-lg font-bold text-white mb-2">${appointment.name}</h3>
+                        <p class="text-gray-400 mb-1">Service: ${appointment.service}</p>
+                         <p><span class="font-medium text-gray-400">Phone:</span> ${appointment.phone}</p>
+                         <p><span class="font-medium text-gray-400">Email:</span> ${appointment.email}</p>
+                          <p><span class="font-medium text-gray-400">Doctor:</span> ${appointment.doctor}</p>
+                        <p class="text-gray-400 mb-4">Time: ${appointment.appointmentTime}</p>
+                        <button class="cancel-btn  bg-red-500 text-white px-7 py-2 rounded-lg hover:bg-red-700 transition duration-300 ease-in-out"
+                            data-id="${appointment.id}">Cancel Appointment</button>
+                        <button class="edit-btn  bg-blue-500 text-white px-11 py-2 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out"" data-id="${appointment.id}">
+                            Edit Appointment
+                        </button>
+                    </div>
+                `;
+
+                appointmentsList.insertAdjacentHTML('beforeend', appointmentHTML);
+            });
+
+            // Add event listeners for edit buttons
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const appointmentId = this.getAttribute('data-id');
+                    const selectedAppointment = appointments.find(appt => appt.id === appointmentId); // Fetch the selected appointment data
+                    openEditModal(selectedAppointment);
+                });
+            });
+
+            // Add event listeners for cancel buttons
+            document.querySelectorAll('.cancel-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const appointmentId = this.getAttribute('data-id');
+                    openConfirmModal(function (confirmed) {
+                        if (confirmed) {
+                            cancelAppointment(appointmentId);
+                        }
+                    });
+                });
+            });
+        }
+
+        // Function to cancel an appointment in Firebase
+        function cancelAppointment(appointmentId) {
+            db.collection("appointments").doc(appointmentId).delete()
+                .then(function () {
+                    openModal("Appointment cancelled successfully.");
+                    // Refresh the appointments list
+                    const selectedDate = document.getElementById("appointment-date").value;
+                    fetchAppointmentsByDate(selectedDate);
+                })
+                .catch(function (error) {
+                    console.error("Error cancelling appointment: ", error);
+                    openModal("Error cancelling appointment.");
+                });
+        }
+
+        // Event listener for viewing appointments
+        document.getElementById('view-appointments-btn').addEventListener('click', function () {
+            const selectedDate = document.getElementById("appointment-date").value;
+            if (!selectedDate) {
+                openModal("Please select a date.");
+                return;
+            }
+            fetchAppointmentsByDate(selectedDate);
+        });
+
+    </script>
+</body>
+
+</html>
